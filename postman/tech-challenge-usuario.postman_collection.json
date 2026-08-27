@@ -1,0 +1,156 @@
+{
+  "info": {
+    "name": "Tech Challenge - Usuario Service",
+    "description": "Collection de testes do CRUD de usuario, troca de senha e login. Cobre cenarios de sucesso e falha conforme exigido no desafio.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "usuarioId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Cadastro - sucesso",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/v1/usuarios",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Thiago Silva\",\n  \"email\": \"thiago@teste.com\",\n  \"login\": \"thiago.silva\",\n  \"endereco\": {\n    \"rua\": \"Rua Teste\",\n    \"numero\": \"123\",\n    \"cidade\": \"Sao Bernardo do Campo\",\n    \"estado\": \"SP\",\n    \"cep\": \"09600-000\"\n  },\n  \"tipo\": \"CLIENTE\",\n  \"senha\": \"senha123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "2. Cadastro - falha (email duplicado)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/v1/usuarios",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Outro Usuario\",\n  \"email\": \"thiago@teste.com\",\n  \"login\": \"outro.login\",\n  \"tipo\": \"CLIENTE\",\n  \"senha\": \"senha123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "3. Cadastro - falha (campo obrigatorio faltando)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/v1/usuarios",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"sememnome@teste.com\",\n  \"login\": \"sem.nome\",\n  \"tipo\": \"CLIENTE\",\n  \"senha\": \"senha123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "4. Login - sucesso",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/v1/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"usuario\": \"thiago.silva\",\n  \"senha\": \"senha123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "5. Login - falha (senha errada)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/v1/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"usuario\": \"thiago.silva\",\n  \"senha\": \"senhaErrada\"\n}"
+        }
+      }
+    },
+    {
+      "name": "6. Buscar por nome (parcial) - sucesso",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/v1/usuarios?nome=thi"
+      }
+    },
+    {
+      "name": "7. Buscar por id - sucesso (ajuste o id na URL)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/v1/usuarios/{{usuarioId}}"
+      }
+    },
+    {
+      "name": "8. Buscar por id - falha (id inexistente)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/v1/usuarios/999999"
+      }
+    },
+    {
+      "name": "9. Atualizacao - sucesso (ajuste o id na URL)",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/v1/usuarios/{{usuarioId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Thiago Silva Santos\",\n  \"email\": \"thiago@teste.com\",\n  \"login\": \"thiago.silva\",\n  \"endereco\": {\n    \"rua\": \"Rua Nova\",\n    \"numero\": \"456\",\n    \"cidade\": \"Santo Andre\",\n    \"estado\": \"SP\",\n    \"cep\": \"09000-000\"\n  },\n  \"tipo\": \"CLIENTE\"\n}"
+        }
+      }
+    },
+    {
+      "name": "10. Atualizacao - falha (id inexistente)",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/v1/usuarios/999999",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Nao existe\",\n  \"email\": \"naoexiste@teste.com\",\n  \"login\": \"naoexiste\",\n  \"tipo\": \"CLIENTE\"\n}"
+        }
+      }
+    },
+    {
+      "name": "11. Troca de senha - sucesso (ajuste o id na URL)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/v1/usuarios/{{usuarioId}}/senha",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"novaSenha\": \"novaSenha456\",\n  \"confirmacaoSenha\": \"novaSenha456\"\n}"
+        }
+      }
+    },
+    {
+      "name": "12. Troca de senha - falha (senhas diferentes)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/v1/usuarios/{{usuarioId}}/senha",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"novaSenha\": \"senhaA\",\n  \"confirmacaoSenha\": \"senhaB\"\n}"
+        }
+      }
+    },
+    {
+      "name": "13. Exclusao - sucesso (ajuste o id na URL, faca por ultimo)",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/v1/usuarios/{{usuarioId}}"
+      }
+    },
+    {
+      "name": "14. Exclusao - falha (id inexistente)",
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/v1/usuarios/999999"
+      }
+    }
+  ]
+}

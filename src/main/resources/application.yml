@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: usuario-service
+
+  datasource:
+    # As variaveis de ambiente tem um valor padrao apos os dois-pontos
+    # (ex: localhost, 5432), usado quando rodamos localmente sem Docker.
+    # No docker-compose.yml essas variaveis sao sobrescritas para apontar
+    # para o servico "db" da rede interna do Compose.
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:techchallenge}
+    username: ${DB_USER:techchallenge}
+    password: ${DB_PASSWORD:techchallenge}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      # update: cria/ajusta as tabelas automaticamente a partir das
+      # entidades. Ótimo para desenvolvimento e para este desafio;
+      # em um sistema real de producao o ideal seria usar uma ferramenta
+      # de migration (Flyway/Liquibase) em vez de deixar o Hibernate
+      # alterar o schema sozinho.
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+# Swagger/OpenAPI ficam disponiveis em /swagger-ui.html
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
