@@ -93,7 +93,7 @@ Variaveis de ambiente aceitas (todas com valor padrao):
 
 ## Repositorio
 
-`[preencher com o link do repositorio publico no GitHub]`
+<https://github.com/thibrown1/tech-challenge-usuario>
 
 ## Postman
 
