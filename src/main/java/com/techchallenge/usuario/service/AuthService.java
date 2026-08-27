@@ -5,22 +5,27 @@ import com.techchallenge.usuario.dto.LoginResponseDTO;
 import com.techchallenge.usuario.entity.Usuario;
 import com.techchallenge.usuario.exception.CredenciaisInvalidasException;
 import com.techchallenge.usuario.repository.UsuarioRepository;
+import com.techchallenge.usuario.security.JwtService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
- * Autenticacao simples, sem Spring Security (opcional nesta fase,
- * conforme o enunciado). Busca o usuario por login e compara a senha
- * enviada com o hash salvo no banco usando BCrypt.
+ * Autenticacao simples (login/senha consultados no banco, sem depender do
+ * AuthenticationManager do Spring Security -- conforme o enunciado, que
+ * torna Spring Security opcional para ESSA parte). A partir da autenticacao
+ * bem-sucedida, agora tambem emitimos um JWT (desafio extra), que e' o que
+ * o Spring Security de fato usa para proteger as demais rotas da API.
  */
 @Service
 public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
+    private final JwtService jwtService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public AuthService(UsuarioRepository usuarioRepository) {
+    public AuthService(UsuarioRepository usuarioRepository, JwtService jwtService) {
         this.usuarioRepository = usuarioRepository;
+        this.jwtService = jwtService;
     }
 
     public LoginResponseDTO autenticar(LoginDTO dto) {
@@ -34,6 +39,9 @@ public class AuthService {
             throw new CredenciaisInvalidasException();
         }
 
-        return new LoginResponseDTO(true, usuario.getId(), usuario.getNome(), "Login realizado com sucesso.");
+        String token = jwtService.gerarToken(usuario.getId(), usuario.getLogin(), usuario.getTipo().name());
+
+        return new LoginResponseDTO(true, usuario.getId(), usuario.getNome(),
+                "Login realizado com sucesso.", token);
     }
 }

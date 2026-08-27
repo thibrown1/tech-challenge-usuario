@@ -1,15 +1,15 @@
 package com.techchallenge.usuario.dto;
 
 /**
- * Resposta simples de login. Como Spring Security e' opcional nesta fase
- * (conforme o enunciado), nao geramos um token JWT de verdade -- apenas
- * confirmamos a autenticacao e devolvemos os dados basicos do usuario.
- * Gerar um token JWT seria a evolucao natural disso numa fase futura.
+ * Resposta do login. Agora que Spring Security + JWT foi implementado
+ * (desafio extra), o campo "token" traz o Bearer token que deve ser enviado
+ * no header Authorization das demais chamadas protegidas da API.
  */
 public record LoginResponseDTO(
         boolean autenticado,
         Long usuarioId,
         String nome,
-        String mensagem
+        String mensagem,
+        String token
 ) {
 }

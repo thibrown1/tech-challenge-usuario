@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -118,6 +119,7 @@ public class UsuarioController {
                                     }
                                     """)))
     })
+    @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> atualizar(
             @PathVariable Long id,
@@ -140,6 +142,7 @@ public class UsuarioController {
                                     }
                                     """)))
     })
+    @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
         usuarioService.excluir(id);
@@ -174,6 +177,7 @@ public class UsuarioController {
                                     }
                                     """)))
     })
+    @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(usuarioService.buscarPorId(id));
@@ -202,6 +206,7 @@ public class UsuarioController {
                             name = "Lista vazia",
                             value = "[]")))
     })
+    @SecurityRequirement(name = "bearerAuth")
     @GetMapping
     public ResponseEntity<List<UsuarioResponseDTO>> buscar(
             @RequestParam(required = false) String nome) {
@@ -226,6 +231,7 @@ public class UsuarioController {
                                     }
                                     """)))
     })
+    @SecurityRequirement(name = "bearerAuth")
     @PostMapping("/{id}/senha")
     public ResponseEntity<Void> trocarSenha(
             @PathVariable Long id,

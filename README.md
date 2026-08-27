@@ -9,7 +9,8 @@ exclusivamente o dominio de Usuario.
 - Java 21
 - Spring Boot 3.3
 - Spring Data JPA + PostgreSQL
-- BCrypt (spring-security-crypto) para hash de senha
+- Spring Security + JWT (autenticacao e autorizacao das rotas protegidas)
+- BCrypt para hash de senha
 - springdoc-openapi (Swagger UI)
 - Docker + Docker Compose
 
@@ -36,7 +37,16 @@ os dois deixaria o endpoint de atualizacao com responsabilidade dupla.
 
 **Tratamento de erro:** centralizado num `GlobalExceptionHandler` usando
 `ProblemDetail` (RFC 7807), suportado nativamente pelo Spring Boot 3.
-Toda resposta de erro da API sai no mesmo formato.
+Toda resposta de erro da API sai no mesmo formato -- inclusive os erros de
+autenticacao/autorizacao 401/403 gerados pelo Spring Security, tratados no
+mesmo formato via `SecurityConfig`.
+
+**Autenticacao (desafio extra):** o enunciado torna Spring Security
+opcional para a validacao de login/senha (feita de forma simples, consultando
+o banco). A partir dessa validacao, porem, o `POST /v1/login` agora emite um
+JWT, e o Spring Security usa esse token para proteger todas as demais rotas
+de `/v1/usuarios` -- cadastro e login continuam publicos, pois e' preciso
+poder se cadastrar e logar sem ja ter um token.
 
 ## Como rodar (com Docker — recomendado)
 
@@ -76,7 +86,8 @@ mvn spring-boot:run
 ```
 
 Variaveis de ambiente aceitas (todas com valor padrao):
-`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `SERVER_PORT`.
+`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `SERVER_PORT`,
+`JWT_SECRET`, `JWT_EXPIRATION_MS`.
 
 ## Endpoints
 
@@ -91,6 +102,41 @@ Variaveis de ambiente aceitas (todas com valor padrao):
 | POST   | `/v1/usuarios/{id}/senha`      | Troca de senha                      |
 | POST   | `/v1/login`                    | Autenticacao                        |
 
+## Autenticacao (JWT)
+
+Rotas publicas (nao exigem token): `POST /v1/usuarios` (cadastro) e
+`POST /v1/login`.
+
+Todas as demais rotas de `/v1/usuarios` exigem um Bearer token, obtido no
+login:
+
+```bash
+curl -X POST http://localhost:8080/v1/login \
+  -H "Content-Type: application/json" \
+  -d '{"usuario": "thiago.silva", "senha": "senha123"}'
+```
+
+A resposta inclui o campo `token`. Use-o nas demais chamadas:
+
+```bash
+curl http://localhost:8080/v1/usuarios/1 \
+  -H "Authorization: Bearer <token>"
+```
+
+No Swagger UI (`/swagger-ui.html`), clique em **Authorize** e cole o token
+(sem o prefixo `Bearer`) para testar as rotas protegidas pela propria
+documentacao interativa.
+
+## Testes automatizados
+
+Testes unitarios (JUnit 5 + Mockito) cobrem as regras de negocio de
+`UsuarioService` e `AuthService`, mockando o `UsuarioRepository` -- nao
+exigem banco de dados nem contexto Spring:
+
+```bash
+mvn test
+```
+
 ## Repositorio
 
 <https://github.com/thibrown1/tech-challenge-usuario>
@@ -99,9 +145,13 @@ Variaveis de ambiente aceitas (todas com valor padrao):
 
 A collection de testes fica em `postman/tech-challenge-usuario.postman_collection.json`,
 cobrindo os cenarios de sucesso e falha de cadastro, login, busca, atualizacao,
-troca de senha e exclusao.
+troca de senha e exclusao. O request de login de sucesso salva o token
+automaticamente numa variavel de collection (`token`), usada como Bearer
+auth pelas demais requisicoes -- basta rodar o login uma vez antes das
+outras chamadas.
 
 ## Proximos passos (fora do escopo desta fase)
 
-- Testes automatizados
-- JWT real no login (hoje o login apenas valida credenciais)
+- Autorizacao por papel (hoje o JWT autentica, mas nao restringe rotas
+  por `TipoUsuario` -- ex.: so o Dono de Restaurante poder excluir contas)
+- Refresh token / expiracao configuravel por ambiente

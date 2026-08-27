@@ -36,7 +36,8 @@ public class AuthController {
                                       "autenticado": true,
                                       "usuarioId": 1,
                                       "nome": "Thiago Silva",
-                                      "mensagem": "Login realizado com sucesso."
+                                      "mensagem": "Login realizado com sucesso.",
+                                      "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0aGlhZ28uc2lsdmEi...(JWT)"
                                     }
                                     """))),
             @ApiResponse(responseCode = "401", description = "Login ou senha invalidos",
